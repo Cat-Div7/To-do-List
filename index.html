@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>To-Do List</title>
+    <link rel="stylesheet" href="main.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+  </head>
+  <body class="normal-mode">
+    <!-- Dark Mode Button -->
+    <div class="theme-switch-wrapper">
+      <span class="theme-text">Dark Mode &#61;&gt;</span>
+      <!-- CheckBox -->
+      <label class="theme-switch" for="checkbox">
+        <input type="checkbox" id="checkbox" class="toggle-modes" />
+        <div class="slider round"></div>
+      </label>
+    </div>
+    <!-- To Do List -->
+    <div class="todo-container">
+      <h1>To-Do List</h1>
+      <!-- Filter Buttons -->
+      <div class="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="completed">Completed</button>
+        <button class="filter-btn" data-filter="uncompleted">
+          Uncompleted
+        </button>
+        <!-- Delete All Tasks -->
+        <button class="delete-all-btn">Delete All</button>
+      </div>
+      <!-- Input Form -->
+      <form class="todo-input">
+        <input type="text" placeholder="Add a new task..." />
+        <input type="submit" value="Add" />
+      </form>
+      <!-- Alert Of Passing Length -->
+      <p class="alert-length">Alert Here</p>
+      <!-- List Of To-do Tasks -->
+      <ul class="todo-list">
+        <!-- <li class="todo-item">
+          <span>Learn HTML</span>
+          <div class="actions">
+            <button class="complete">
+              <i class="fas fa-check-circle"></i>
+            </button>
+            <button class="delete"><i class="fas fa-times-circle"></i></button>
+          </div>
+        </li>
+        <li class="todo-item">
+          <span>Style with CSS</span>
+          <div class="actions">
+            <button class="complete">
+              <i class="fas fa-check-circle"></i>
+            </button>
+            <button class="delete"><i class="fas fa-times-circle"></i></button>
+          </div>
+        </li>
+        <li class="todo-item">
+          <span>Build a To-Do List</span>
+          <div class="actions">
+            <button class="complete">
+              <i class="fas fa-check-circle"></i>
+            </button>
+            <button class="delete"><i class="fas fa-times-circle"></i></button>
+          </div>
+        </li> -->
+      </ul>
+    </div>
+    <script src="main.js"></script>
+  </body>
+</html>
