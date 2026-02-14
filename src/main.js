@@ -15,6 +15,7 @@ function runOnceFunction() {
       order: "",
     },
   ];
+  // TODO: Replace With Custom Func
   localStorage.setItem("tasks", JSON.stringify(existedElements));
 }
 
@@ -33,6 +34,7 @@ window.onload = () => {
       themeText.textContent = "Dark Mode =>";
     }
   }
+
   // Input Value
   let inputValueSavec = sessionStorage.getItem("inputValue");
   input.value = inputValueSavec;
@@ -141,31 +143,6 @@ trashIconExistElements.classList.add("fas", "fa-times-circle");
 // Complete Button Click Event For Existed Elements Before Only
 // Add Event Listeners to Existing Buttons on Page Load
 
-// Old Single Event
-
-// document.querySelectorAll(".complete").forEach((button) => {
-//   button.addEventListener("click", () => {
-//     // Closest Takes a value and search in parents and grands
-//     button.closest(".todo-item").classList.toggle("done");
-//     button.children[0].classList.toggle("fa-undo");
-//     button.children[0].classList.toggle("fa-check-circle");
-//     // Change order
-//     console.log(button.closest(".todo-item"));
-//     if (button.closest(".todo-item").classList.contains("done")) {
-//       button.closest(".todo-item").style.order = currentOrder++;
-//     } else {
-//       button.closest(".todo-item").style.order = "";
-//       currentOrder--;
-//     }
-//   });
-// });
-
-// document.querySelectorAll(".delete").forEach((button) => {
-//   // console.log(button);
-//   button.addEventListener("click", function () {
-//     button.closest(".todo-item").remove();
-//   });
-// });
 
 // Event Delegation for Complete and Delete Buttons
 tasksList.addEventListener("click", (e) => {
@@ -340,35 +317,6 @@ document.forms[0].addEventListener("submit", (e) => {
   array.push(newTask);
   // Push Back To LocalStorage
   localStorage.setItem("tasks", JSON.stringify(array));
-
-  // Complete Button Click Event
-  // Add Event Listeners to Complete Buttons
-  // saveTasksToLocalStorage();
-  // Old Single New Task Event Complete
-
-  // $completeBtn.addEventListener("click", () => {
-  //   $li.classList.toggle("done");
-  //   // Change Icon
-  //   checkIcon.classList.toggle("fa-undo");
-  //   checkIcon.classList.toggle("fa-check-circle");
-  //   // Change order
-  //   if (checkIcon.closest(".todo-item").classList.contains("done")) {
-  //     checkIcon.closest(".todo-item").style.order = currentOrder++;
-  //   } else {
-  //     checkIcon.closest(".todo-item").style.order = "";
-  //     currentOrder--;
-  //   }
-  //   // Update Value to Completed In LocalStorage
-  // });
-
-  // Old Single New Task Event Delete
-
-  // $deleteBtn.addEventListener("click", function () {
-  //   this.closest(".todo-item").remove();
-  // });
-
-  // $li = createTaskElement(newTask);
-  // tasksList.appendChild($li);
 });
 
 // Filters
@@ -419,8 +367,6 @@ function filterTasks(filterType) {
     }
   });
 }
+
 // Initial filter application on load (optional, defaults to 'all')
 filterTasks("all");
-
-// sessionStorage.clear()
-// localStorage.clear()
