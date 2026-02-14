@@ -5,7 +5,7 @@ import {
   updateTask,
   deleteTask,
   resetTasks,
-} from "./storage/tasks";
+} from "./storage/tasks.js";
 
 // Check if the flag exists in localStorage
 if (localStorage.getItem("hasCodeRunBefore") === null) {
@@ -13,6 +13,7 @@ if (localStorage.getItem("hasCodeRunBefore") === null) {
   runOnceFunction();
   localStorage.setItem("hasCodeRunBefore", "true");
 }
+
 function runOnceFunction() {
   const existedElements = [
     { id: "task-0", content: "Learn HTML", completed: false, order: "" },
