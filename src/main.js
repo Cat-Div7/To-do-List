@@ -1,3 +1,12 @@
+import {
+  saveTasks,
+  getTasks,
+  addTask,
+  updateTask,
+  deleteTask,
+  resetTasks,
+} from "./storage/tasks";
+
 // Check if the flag exists in localStorage
 if (localStorage.getItem("hasCodeRunBefore") === null) {
   // If not, run the function and set the flag
@@ -15,8 +24,7 @@ function runOnceFunction() {
       order: "",
     },
   ];
-  // TODO: Replace With Custom Func
-  localStorage.setItem("tasks", JSON.stringify(existedElements));
+  saveTasks(existedElements);
 }
 
 // Get All Local Storage Items
@@ -38,58 +46,51 @@ window.onload = () => {
   // Input Value
   let inputValueSavec = sessionStorage.getItem("inputValue");
   input.value = inputValueSavec;
+
   // Tasks Load
-  let taskExists = localStorage.getItem("tasks");
-  if (taskExists) {
-    // Add To localStorage
-    let array = JSON.parse(window.localStorage.getItem("tasks")) || [];
-    // Writing Elements Again
-    for (let i = 0; i < array.length; i++) {
+  const tasks = getTasks();
+
+  if (tasks.length > 0) {
+    tasks.forEach((task) => {
       // Create New Task Element
       const $li = document.createElement("li");
       const $span = document.createElement("span");
-      const $spanText = document.createTextNode(array[i].content);
+      $span.textContent = task.content;
       const $actionsDiv = document.createElement("div");
       const $completeBtn = document.createElement("button");
       const $deleteBtn = document.createElement("button");
-      // Adding Classes To Each Element Requires
+
       $li.classList.add("todo-item");
-      $li.id = array[i].id;
+      $li.id = task.id;
       $actionsDiv.classList.add("actions");
       $completeBtn.classList.add("complete");
       $deleteBtn.classList.add("delete");
-      // Append Task Text To parent
-      $span.appendChild($spanText);
-      // Add Icons To Btns
-      // Add Icons To Btns (Locally created for each task)
+
       const checkIcon = document.createElement("i");
       checkIcon.classList.add("fas", "fa-check-circle");
       const trashIcon = document.createElement("i");
       trashIcon.classList.add("fas", "fa-times-circle");
+
       $completeBtn.appendChild(checkIcon);
       $deleteBtn.appendChild(trashIcon);
-      // Append Actions To Action Div
+
       $actionsDiv.appendChild($completeBtn);
       $actionsDiv.appendChild($deleteBtn);
-      // Appending Elements To Parent
+
       $li.appendChild($span);
       $li.appendChild($actionsDiv);
       tasksList.appendChild($li);
-      // Add done Class If Completed Is Marked
-      if (array[i].completed === true) {
+
+      if (task.completed) {
         $li.classList.add("done");
-        // Also ensure the check icon is correctly set if the task is done
-        checkIcon.classList.remove("fa-check-circle");
-        checkIcon.classList.add("fa-undo");
-        // Add Order
-        if (array[i].order !== "") {
-          $li.style.order = array[i].order;
-        }
+        checkIcon.classList.replace("fa-check-circle", "fa-undo");
+        if (task.order !== "") $li.style.order = task.order;
       }
-    }
+    });
   } else {
-    localStorage.setItem("tasks", JSON.stringify([]));
+    saveTasks([]);
   }
+
   // Load Filter From Local Storage
   let existFilter = localStorage.getItem("filterType");
   if (existFilter) {
@@ -143,7 +144,6 @@ trashIconExistElements.classList.add("fas", "fa-times-circle");
 // Complete Button Click Event For Existed Elements Before Only
 // Add Event Listeners to Existing Buttons on Page Load
 
-
 // Event Delegation for Complete and Delete Buttons
 tasksList.addEventListener("click", (e) => {
   // Get Clicked Button
@@ -155,80 +155,54 @@ tasksList.addEventListener("click", (e) => {
   const icon = clickedButton.querySelector("i");
   // Check If Complete Button Or Delete
   if (clickedButton.classList.contains("complete")) {
+    // Toggle done class on the task
     $li.classList.toggle("done");
+
     if (icon) {
+      // Toggle the icon between check-circle and undo
       icon.classList.toggle("fa-undo");
       icon.classList.toggle("fa-check-circle");
-      // Check If Icon Is Undo
-      if (icon.classList.contains("fa-undo")) {
-        let array = JSON.parse(window.localStorage.getItem("tasks"));
-        for (let i = 0; i < array.length; i++) {
-          // Update Value When Completed
-          if ($li.id === array[i].id) {
-            array[i].completed = true;
-            localStorage.setItem("tasks", JSON.stringify(array));
-          } else {
-            continue;
-          }
-        }
-      } else if (icon.classList.contains("fa-check-circle")) {
-        let array = JSON.parse(window.localStorage.getItem("tasks"));
-        for (let i = 0; i < array.length; i++) {
-          // Update Value When UnCompleted
-          if ($li.id === array[i].id) {
-            array[i].completed = false;
-            localStorage.setItem("tasks", JSON.stringify(array));
-          } else {
-            continue;
-          }
-        }
-      }
     }
+
+    // Update completed value in LocalStorage based on 'done' class
+    updateTask($li.id, { completed: $li.classList.contains("done") });
+
     if ($li.classList.contains("done")) {
+      // Add order to completed task
       $li.style.order = currentOrder;
-      // Add To localStorage
-      let array = JSON.parse(window.localStorage.getItem("tasks"));
-      for (let k = 0; k < array.length; k++) {
-        if ($li.id === array[k].id) {
-          // Add Order
-          array[k].order = currentOrder;
-          localStorage.setItem("tasks", JSON.stringify(array));
-        } else {
-          continue;
-        }
-      }
+
+      // Update order in LocalStorage
+      updateTask($li.id, { order: currentOrder });
+
       currentOrder++;
     } else {
+      // Remove order if task is uncompleted
       $li.style.order = "";
-      // Remove Completed Value From LocalStorage
+      // Reset order in LocalStorage
+      updateTask($li.id, { order: "" });
     }
   } else if (clickedButton.classList.contains("delete")) {
-    // Remove From Local Storage & Page
-    let array = JSON.parse(window.localStorage.getItem("tasks"));
-    for (let i = 0; i < array.length; i++) {
-      if ($li.id === array[i].id) {
-        let updatedArray = array.filter((item) => item.id !== $li.id);
-        localStorage.setItem("tasks", JSON.stringify(updatedArray));
-        $li.remove();
-        currentId--;
-      }
-    }
-    // Reset Id
-    let count = tasksList.querySelectorAll(".todo-item").length;
-    if (count < 1) {
-      currentId = 0;
-    }
+    // Remove From Local Storage Using helper
+    deleteTask($li.id);
+    // Remove Fron the Page
+    $li.remove();
+    currentId--;
+    // Reset ID if list is empty
+    const count = tasksList.querySelectorAll(".todo-item").length;
+    if (count < 1) currentId = 0;
   }
 });
 
 // Delete All Button
 const deleteAllBtn = document.querySelector(".delete-all-btn");
 deleteAllBtn.addEventListener("click", () => {
+  // Reset (List, order, id) when all the tasks are deleted
   tasksList.innerHTML = "";
-  currentOrder = 1; // Reset order when all tasks are deleted
-  currentId = 0; // Reset id when all tasks are deleted
-  // Edit Local Storage
-  localStorage.setItem("tasks", JSON.stringify([]));
+  currentOrder = 1;
+  currentId = 0;
+
+  // Reset Local Storage
+  resetTasks();
 });
 
 // On Input Check If Value Length is More than 30
@@ -305,18 +279,16 @@ document.forms[0].addEventListener("submit", (e) => {
   $li.appendChild($actionsDiv);
   tasksList.appendChild($li);
 
-  // Make Object To Push To Local
+  // Make mewTask Object
   let newTask = {
     id: $li.id,
     content: newTaskValue,
     completed: false,
     order: "",
   };
-  // Add To localStorage
-  let array = JSON.parse(window.localStorage.getItem("tasks")) || [];
-  array.push(newTask);
-  // Push Back To LocalStorage
-  localStorage.setItem("tasks", JSON.stringify(array));
+
+  // Add Task to LocalStorage
+  addTask(newTask);
 });
 
 // Filters
