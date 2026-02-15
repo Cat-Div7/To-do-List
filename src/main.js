@@ -6,7 +6,7 @@ import {
   deleteTask,
   resetTasks,
 } from "./storage/tasks.js";
-import { checkIcon, trashIcon } from "./utils/icons.js";
+import { createTaskElement } from "./utils/createTaskElement.js";
 
 // Check if the flag exists in localStorage
 if (localStorage.getItem("hasCodeRunBefore") === null) {
@@ -51,39 +51,11 @@ window.onload = () => {
 
   // Tasks Load
   const tasks = getTasks();
-
   if (tasks.length > 0) {
     tasks.forEach((task) => {
       // Create New Task Element
-      const $li = document.createElement("li");
-      const $span = document.createElement("span");
-      $span.textContent = task.content;
-      const $actionsDiv = document.createElement("div");
-      const $completeBtn = document.createElement("button");
-      const $deleteBtn = document.createElement("button");
-
-      $li.classList.add("todo-item");
-      $li.id = task.id;
-      $actionsDiv.classList.add("actions");
-      $completeBtn.classList.add("complete");
-      $deleteBtn.classList.add("delete");
-
-      $completeBtn.appendChild(checkIcon());
-      $deleteBtn.appendChild(trashIcon());
-
-      $actionsDiv.appendChild($completeBtn);
-      $actionsDiv.appendChild($deleteBtn);
-
-      $li.appendChild($span);
-      $li.appendChild($actionsDiv);
-      tasksList.appendChild($li);
-
-      if (task.completed) {
-        $li.classList.add("done");
-        const icon = $completeBtn.querySelector("i");
-        icon.classList.replace("fa-check-circle", "fa-undo");
-        if (task.order !== "") $li.style.order = task.order;
-      }
+      const element = createTaskElement(task);
+      tasksList.appendChild(element);
     });
   } else {
     saveTasks([]);
@@ -102,6 +74,8 @@ window.onload = () => {
     });
     // Add 'active' class to the clicked button
   }
+
+  input.focus();
 };
 
 // Dark Mode Settings
@@ -133,7 +107,11 @@ const addBtn = inputContainer.querySelector("input[type='submit']");
 const alert = document.querySelector(".alert-length");
 // Declare Order To Completed Tasks
 let currentOrder = 1;
-let currentId = 3;
+// Load Id from LocalStorage
+const tasks = getTasks();
+let currentId = tasks.length
+  ? Math.max(...tasks.map((t) => Number(t.id.split("-")[1]))) + 1
+  : 0;
 // Complete Button Click Event For Existed Elements Before Only
 // Add Event Listeners to Existing Buttons on Page Load
 
@@ -179,7 +157,7 @@ tasksList.addEventListener("click", (e) => {
     deleteTask($li.id);
     // Remove Fron the Page
     $li.remove();
-    currentId--;
+    currentId++;
     // Reset ID if list is empty
     const count = tasksList.querySelectorAll(".todo-item").length;
     if (count < 1) currentId = 0;
@@ -191,7 +169,7 @@ const deleteAllBtn = document.querySelector(".delete-all-btn");
 deleteAllBtn.addEventListener("click", () => {
   // Reset (List, order, id) when all the tasks are deleted
   tasksList.innerHTML = "";
-  currentOrder = 1;
+  currentOrder = Math.max(0, ...tasks.map((t) => t.order || 0)) + 1;
   currentId = 0;
 
   // Reset Local Storage
@@ -241,41 +219,21 @@ document.forms[0].addEventListener("submit", (e) => {
   // Delete Input Value From Overflow
   input.value = "";
   sessionStorage.setItem("inputValue", "");
-  // Create New Task Element
-  const $li = document.createElement("li");
-  const $span = document.createElement("span");
-  const $spanText = document.createTextNode(newTaskValue);
-  const $actionsDiv = document.createElement("div");
-  const $completeBtn = document.createElement("button");
-  const $deleteBtn = document.createElement("button");
-  // Adding Classes To Each Element Requires
-  $li.classList.add("todo-item");
-  $li.id = `task-${currentId++}`;
-  $actionsDiv.classList.add("actions");
-  $completeBtn.classList.add("complete");
-  $deleteBtn.classList.add("delete");
-  // Append Task Text To parent
-  $span.appendChild($spanText);
-  // Add Icons To Btns (Locally created for each task)
-  $completeBtn.appendChild(checkIcon());
-  $deleteBtn.appendChild(trashIcon());
-  // Append Actions To Action Div
-  $actionsDiv.appendChild($completeBtn);
-  $actionsDiv.appendChild($deleteBtn);
-  // Appending Elements To Parent
-  $li.appendChild($span);
-  $li.appendChild($actionsDiv);
-  tasksList.appendChild($li);
-
-  // Make mewTask Object
-  let newTask = {
-    id: $li.id,
+  // Create task object
+  const newTask = {
+    id: `task-${currentId++}`,
     content: newTaskValue,
     completed: false,
     order: "",
   };
 
-  // Add Task to LocalStorage
+  // Create DOM element
+  const taskElement = createTaskElement(newTask);
+
+  // Append to list
+  tasksList.appendChild(taskElement);
+
+  // Save to storage
   addTask(newTask);
 });
 
