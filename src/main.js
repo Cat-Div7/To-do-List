@@ -6,6 +6,7 @@ import {
   deleteTask,
   resetTasks,
 } from "./storage/tasks.js";
+import { checkIcon, trashIcon } from "./utils/icons.js";
 
 // Check if the flag exists in localStorage
 if (localStorage.getItem("hasCodeRunBefore") === null) {
@@ -67,13 +68,8 @@ window.onload = () => {
       $completeBtn.classList.add("complete");
       $deleteBtn.classList.add("delete");
 
-      const checkIcon = document.createElement("i");
-      checkIcon.classList.add("fas", "fa-check-circle");
-      const trashIcon = document.createElement("i");
-      trashIcon.classList.add("fas", "fa-times-circle");
-
-      $completeBtn.appendChild(checkIcon);
-      $deleteBtn.appendChild(trashIcon);
+      $completeBtn.appendChild(checkIcon());
+      $deleteBtn.appendChild(trashIcon());
 
       $actionsDiv.appendChild($completeBtn);
       $actionsDiv.appendChild($deleteBtn);
@@ -84,7 +80,8 @@ window.onload = () => {
 
       if (task.completed) {
         $li.classList.add("done");
-        checkIcon.classList.replace("fa-check-circle", "fa-undo");
+        const icon = $completeBtn.querySelector("i");
+        icon.classList.replace("fa-check-circle", "fa-undo");
         if (task.order !== "") $li.style.order = task.order;
       }
     });
@@ -137,11 +134,6 @@ const alert = document.querySelector(".alert-length");
 // Declare Order To Completed Tasks
 let currentOrder = 1;
 let currentId = 3;
-// Icons For Existed Elements Before Only
-const checkIconExistElements = document.createElement("i");
-checkIconExistElements.classList.add("fas", "fa-check-circle");
-const trashIconExistElements = document.createElement("i");
-trashIconExistElements.classList.add("fas", "fa-times-circle");
 // Complete Button Click Event For Existed Elements Before Only
 // Add Event Listeners to Existing Buttons on Page Load
 
@@ -264,14 +256,9 @@ document.forms[0].addEventListener("submit", (e) => {
   $deleteBtn.classList.add("delete");
   // Append Task Text To parent
   $span.appendChild($spanText);
-  // Add Icons To Btns
   // Add Icons To Btns (Locally created for each task)
-  const checkIcon = document.createElement("i");
-  checkIcon.classList.add("fas", "fa-check-circle");
-  const trashIcon = document.createElement("i");
-  trashIcon.classList.add("fas", "fa-times-circle");
-  $completeBtn.appendChild(checkIcon);
-  $deleteBtn.appendChild(trashIcon);
+  $completeBtn.appendChild(checkIcon());
+  $deleteBtn.appendChild(trashIcon());
   // Append Actions To Action Div
   $actionsDiv.appendChild($completeBtn);
   $actionsDiv.appendChild($deleteBtn);
