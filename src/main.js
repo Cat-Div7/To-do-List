@@ -10,6 +10,7 @@ import { createTaskElement } from "./utils/createTaskElement.js";
 import { initTheme } from "./utils/theme.js";
 import { validateInput } from "./utils/validation.js";
 import { showAlert, hideAlert } from "./utils/alert.js";
+import { addTaskFlow } from "./services/taskService.js";
 
 // DOM CACHE
 const DOM = {
@@ -41,7 +42,6 @@ if (
   !DOM.deleteAllBtn ||
   !DOM.filtersContainer
 ) {
-  console.error("❌ Required DOM elements missing");
   throw new Error("DOM initialization failed");
 }
 
@@ -105,6 +105,10 @@ window.onload = () => {
 
 // Declare Order To Completed Tasks
 let currentOrder = 1;
+function generateTaskId() {
+  return `task-${currentId++}`;
+}
+
 // Load Id from LocalStorage
 const tasks = getTasks();
 let currentId = tasks.length
@@ -194,25 +198,16 @@ DOM.form.addEventListener("submit", (e) => {
   }
   hideAlert(DOM);
 
+  // Create task object
+  addTaskFlow({
+    content: value,
+    tasksList: DOM.tasksList,
+    generateId: generateTaskId,
+  })
+
   // Delete Input Value From Overflow
   DOM.input.value = "";
   sessionStorage.setItem("inputValue", "");
-  // Create task object
-  const newTask = {
-    id: `task-${currentId++}`,
-    content: newTaskValue,
-    completed: false,
-    order: "",
-  };
-
-  // Create DOM element
-  const taskElement = createTaskElement(newTask);
-
-  // Append to list
-  DOM.tasksList.appendChild(taskElement);
-
-  // Save to storage
-  addTask(newTask);
 });
 
 DOM.filtersContainer.addEventListener("click", (e) => {
