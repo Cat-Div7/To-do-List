@@ -7,6 +7,7 @@ import {
   resetTasks,
 } from "./storage/tasks.js";
 import { createTaskElement } from "./utils/createTaskElement.js";
+import { initTheme } from "./utils/theme.js";
 
 // DOM CACHE
 const DOM = {
@@ -66,18 +67,7 @@ function runOnceFunction() {
 // Get All Local Storage Items
 window.onload = () => {
   // Theme Mode
-  let themeMode = localStorage.getItem("themeMode");
-  if (themeMode) {
-    document.body.classList.add(themeMode);
-    // Set the checkbox state and text based on the loaded theme
-    if (themeMode === "dark-mode") {
-      DOM.modeBtn.checked = true;
-      DOM.themeText.textContent = "Light Mode =>";
-    } else {
-      DOM.modeBtn.checked = false;
-      DOM.themeText.textContent = "Dark Mode =>";
-    }
-  }
+  initTheme(DOM);
 
   // Input Value
   let inputValueSavec = sessionStorage.getItem("inputValue");
@@ -111,25 +101,6 @@ window.onload = () => {
   DOM.input.focus();
 };
 
-// Dark Mode Settings
-DOM.modeBtn.addEventListener("click", () => {
-  if (DOM.modeBtn.checked) {
-    // Add Class To Body If Toggle Checked
-    DOM.themeText.textContent = "Dark Mode =>";
-    document.body.classList.remove("normal-mode");
-    document.body.classList.add("dark-mode");
-    // Change Toggle Button Text
-    DOM.themeText.textContent = "Light Mode =>";
-    // Store In Local Storage
-    localStorage.setItem("themeMode", "dark-mode");
-  } else {
-    document.body.classList.remove("dark-mode");
-    document.body.classList.add("normal-mode");
-    DOM.themeText.textContent = "Dark Mode =>";
-    // Store In Local Storage
-    localStorage.setItem("themeMode", "normal-mode");
-  }
-});
 // Declare Order To Completed Tasks
 let currentOrder = 1;
 // Load Id from LocalStorage
@@ -272,7 +243,7 @@ DOM.filtersContainer.addEventListener("click", (e) => {
   filterTasks(filterType);
 });
 
-function filterTasks(filterType) {
+function filterTasks(filterType = "all") {
   const tasks = DOM.tasksList.querySelectorAll(".todo-item");
   tasks.forEach((task) => {
     switch (filterType) {
