@@ -8,6 +8,40 @@ import {
 } from "./storage/tasks.js";
 import { createTaskElement } from "./utils/createTaskElement.js";
 
+// DOM CACHE
+const DOM = {
+  modeBtn: document.querySelector(".toggle-modes"),
+  themeText: document.querySelector(".theme-text"),
+
+  tasksList: document.querySelector(".todo-list"),
+  inputContainer: document.querySelector(".todo-input"),
+  alert: document.querySelector(".alert-length"),
+
+  deleteAllBtn: document.querySelector(".delete-all-btn"),
+  filtersContainer: document.querySelector(".filters"),
+
+  form: document.forms[0],
+};
+
+// derived elements
+DOM.input = DOM.inputContainer?.querySelector("input[type='text']");
+DOM.addBtn = DOM.inputContainer?.querySelector("input[type='submit']");
+DOM.filterButtons = document.querySelectorAll(".filter-btn");
+
+// DOM GUARDS
+if (
+  !DOM.modeBtn ||
+  !DOM.themeText ||
+  !DOM.tasksList ||
+  !DOM.input ||
+  !DOM.alert ||
+  !DOM.deleteAllBtn ||
+  !DOM.filtersContainer
+) {
+  console.error("❌ Required DOM elements missing");
+  throw new Error("DOM initialization failed");
+}
+
 // Check if the flag exists in localStorage
 if (localStorage.getItem("hasCodeRunBefore") === null) {
   // If not, run the function and set the flag
@@ -37,17 +71,17 @@ window.onload = () => {
     document.body.classList.add(themeMode);
     // Set the checkbox state and text based on the loaded theme
     if (themeMode === "dark-mode") {
-      modeBtn.checked = true;
-      themeText.textContent = "Light Mode =>";
+      DOM.modeBtn.checked = true;
+      DOM.themeText.textContent = "Light Mode =>";
     } else {
-      modeBtn.checked = false;
-      themeText.textContent = "Dark Mode =>";
+      DOM.modeBtn.checked = false;
+      DOM.themeText.textContent = "Dark Mode =>";
     }
   }
 
   // Input Value
   let inputValueSavec = sessionStorage.getItem("inputValue");
-  input.value = inputValueSavec;
+  DOM.input.value = inputValueSavec || "";
 
   // Tasks Load
   const tasks = getTasks();
@@ -55,56 +89,47 @@ window.onload = () => {
     tasks.forEach((task) => {
       // Create New Task Element
       const element = createTaskElement(task);
-      tasksList.appendChild(element);
+      DOM.tasksList.appendChild(element);
     });
   } else {
     saveTasks([]);
   }
 
   // Load Filter From Local Storage
-  let existFilter = localStorage.getItem("filterType");
+  const existFilter = localStorage.getItem("filterType");
   if (existFilter) {
-    console.log(existFilter);
     filterTasks(existFilter);
-    document.querySelectorAll(".filter-btn").forEach((btn) => {
-      btn.classList.remove("active");
-      document
-        .querySelector(`[data-filter='${existFilter}']`)
-        .classList.add("active");
-    });
-    // Add 'active' class to the clicked button
+    // remove active from all cached buttons
+    DOM.filterButtons.forEach((btn) => btn.classList.remove("active"));
+    // activate matching button
+    const activeBtn = DOM.filtersContainer.querySelector(
+      `[data-filter='${existFilter}']`,
+    );
+    if (activeBtn) activeBtn.classList.add("active");
   }
 
-  input.focus();
+  DOM.input.focus();
 };
 
 // Dark Mode Settings
-const modeBtn = document.querySelector(".toggle-modes");
-const themeText = document.querySelector(".theme-text");
-modeBtn.addEventListener("click", () => {
-  if (modeBtn.checked) {
+DOM.modeBtn.addEventListener("click", () => {
+  if (DOM.modeBtn.checked) {
     // Add Class To Body If Toggle Checked
-    themeText.textContent = "Dark Mode =>";
+    DOM.themeText.textContent = "Dark Mode =>";
     document.body.classList.remove("normal-mode");
     document.body.classList.add("dark-mode");
     // Change Toggle Button Text
-    themeText.textContent = "Light Mode =>";
+    DOM.themeText.textContent = "Light Mode =>";
     // Store In Local Storage
     localStorage.setItem("themeMode", "dark-mode");
   } else {
     document.body.classList.remove("dark-mode");
     document.body.classList.add("normal-mode");
-    themeText.textContent = "Dark Mode =>";
+    DOM.themeText.textContent = "Dark Mode =>";
     // Store In Local Storage
     localStorage.setItem("themeMode", "normal-mode");
   }
 });
-// To Do Elements
-const tasksList = document.querySelector(".todo-list");
-const inputContainer = document.querySelector(".todo-input");
-const input = inputContainer.querySelector("input[type='text']");
-const addBtn = inputContainer.querySelector("input[type='submit']");
-const alert = document.querySelector(".alert-length");
 // Declare Order To Completed Tasks
 let currentOrder = 1;
 // Load Id from LocalStorage
@@ -116,7 +141,7 @@ let currentId = tasks.length
 // Add Event Listeners to Existing Buttons on Page Load
 
 // Event Delegation for Complete and Delete Buttons
-tasksList.addEventListener("click", (e) => {
+DOM.tasksList.addEventListener("click", (e) => {
   // Get Clicked Button
   const clickedButton =
     e.target.closest(".complete") || e.target.closest(".delete");
@@ -157,18 +182,16 @@ tasksList.addEventListener("click", (e) => {
     deleteTask($li.id);
     // Remove Fron the Page
     $li.remove();
-    currentId++;
     // Reset ID if list is empty
-    const count = tasksList.querySelectorAll(".todo-item").length;
+    const count = DOM.tasksList.querySelectorAll(".todo-item").length;
     if (count < 1) currentId = 0;
   }
 });
 
 // Delete All Button
-const deleteAllBtn = document.querySelector(".delete-all-btn");
-deleteAllBtn.addEventListener("click", () => {
+DOM.deleteAllBtn.addEventListener("click", () => {
   // Reset (List, order, id) when all the tasks are deleted
-  tasksList.innerHTML = "";
+  DOM.tasksList.innerHTML = "";
   currentOrder = Math.max(0, ...tasks.map((t) => t.order || 0)) + 1;
   currentId = 0;
 
@@ -177,47 +200,45 @@ deleteAllBtn.addEventListener("click", () => {
 });
 
 // On Input Check If Value Length is More than 30
-input.oninput = () => {
-  sessionStorage.setItem("inputValue", input.value.trim());
-  if (input.value.trim().length > 30) {
-    alert.classList.add("d-block");
-    inputContainer.classList.add("ally-active");
-    alert.textContent = `Task name character limit: ${
-      input.value.trim().length
+DOM.input.oninput = () => {
+  sessionStorage.setItem("inputValue", DOM.input.value.trim());
+  if (DOM.input.value.trim().length > 30) {
+    DOM.alert.classList.add("d-block");
+    DOM.inputContainer.classList.add("ally-active");
+    DOM.alert.textContent = `Task name character limit: ${
+      DOM.input.value.trim().length
     } / 30`;
-  } else {
-    if (alert.classList.contains("d-block")) {
-      alert.classList.remove("d-block");
-      inputContainer.classList.remove("ally-active");
-    }
+  } else if (DOM.alert.classList.contains("d-block")) {
+    DOM.alert.classList.remove("d-block");
+    DOM.inputContainer.classList.remove("ally-active");
   }
 };
 
 // Adding New Task On Submit
-document.forms[0].addEventListener("submit", (e) => {
+DOM.form.addEventListener("submit", (e) => {
   e.preventDefault();
-  let newTaskValue = input.value.trim();
+  let newTaskValue = DOM.input.value.trim();
   // Check If Value is empty
   if (newTaskValue === "") {
-    alert.classList.add("d-block");
-    inputContainer.classList.add("ally-active");
-    alert.textContent = "Cell Can't be Empty";
+    DOM.alert.classList.add("d-block");
+    DOM.inputContainer.classList.add("ally-active");
+    DOM.alert.textContent = "Cell Can't be Empty";
     return; // Stop
   }
   // Check Before Remove Classes To Skip if false
-  if (alert.classList.contains("d-block")) {
-    alert.classList.remove("d-block");
-    inputContainer.classList.remove("ally-active");
+  if (DOM.alert.classList.contains("d-block")) {
+    DOM.alert.classList.remove("d-block");
+    DOM.inputContainer.classList.remove("ally-active");
   }
   // After Check on Classes Check if value length is more than 40
   if (newTaskValue.length > 30) {
-    alert.classList.add("d-block");
-    inputContainer.classList.add("ally-active");
-    alert.textContent = `Task name character limit: ${newTaskValue.length} / 30`;
+    DOM.alert.classList.add("d-block");
+    DOM.inputContainer.classList.add("ally-active");
+    DOM.alert.textContent = `Task name character limit: ${newTaskValue.length} / 30`;
     return; // Stop
   }
   // Delete Input Value From Overflow
-  input.value = "";
+  DOM.input.value = "";
   sessionStorage.setItem("inputValue", "");
   // Create task object
   const newTask = {
@@ -231,35 +252,28 @@ document.forms[0].addEventListener("submit", (e) => {
   const taskElement = createTaskElement(newTask);
 
   // Append to list
-  tasksList.appendChild(taskElement);
+  DOM.tasksList.appendChild(taskElement);
 
   // Save to storage
   addTask(newTask);
 });
 
-// Filters
-const filtersContainer = document.querySelector(".filters");
-const all = document.querySelector("[data-filter='all']");
-const completedFilter = document.querySelector("[data-filter='completed']");
-const unCompletedFilter = document.querySelector("[data-filter='uncompleted']");
-
-filtersContainer.addEventListener("click", (e) => {
+DOM.filtersContainer.addEventListener("click", (e) => {
   const clickedFilter = e.target.closest(".filter-btn");
   if (!clickedFilter) return;
-  // Remove 'active' class from all filter buttons
-  document
-    .querySelectorAll(".filter-btn")
-    .forEach((btn) => btn.classList.remove("active"));
-  // Add 'active' class to the clicked button
+  // clear active state
+  DOM.filterButtons.forEach((btn) => btn.classList.remove("active"));
+  // activate clicked
   clickedFilter.classList.add("active");
-  // Get Data From data-filter To Use it In Switch Function
+  // apply filter
   const filterType = clickedFilter.getAttribute("data-filter");
+  if (!filterType) return;
   localStorage.setItem("filterType", filterType);
   filterTasks(filterType);
 });
 
 function filterTasks(filterType) {
-  const tasks = document.querySelectorAll(".todo-item");
+  const tasks = DOM.tasksList.querySelectorAll(".todo-item");
   tasks.forEach((task) => {
     switch (filterType) {
       // All Tasks
