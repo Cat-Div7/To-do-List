@@ -8,6 +8,8 @@ import {
 } from "./storage/tasks.js";
 import { createTaskElement } from "./utils/createTaskElement.js";
 import { initTheme } from "./utils/theme.js";
+import { validateInput } from "./utils/validation.js";
+import { showAlert, hideAlert } from "./utils/alert.js";
 
 // DOM CACHE
 const DOM = {
@@ -172,42 +174,26 @@ DOM.deleteAllBtn.addEventListener("click", () => {
 
 // On Input Check If Value Length is More than 30
 DOM.input.oninput = () => {
-  sessionStorage.setItem("inputValue", DOM.input.value.trim());
-  if (DOM.input.value.trim().length > 30) {
-    DOM.alert.classList.add("d-block");
-    DOM.inputContainer.classList.add("ally-active");
-    DOM.alert.textContent = `Task name character limit: ${
-      DOM.input.value.trim().length
-    } / 30`;
-  } else if (DOM.alert.classList.contains("d-block")) {
-    DOM.alert.classList.remove("d-block");
-    DOM.inputContainer.classList.remove("ally-active");
-  }
+  const value = DOM.input.value.trim();
+  sessionStorage.setItem("inputValue", value);
+
+  const error = validateInput(value);
+  if (error) showAlert(DOM, error);
+  else hideAlert(DOM);
 };
 
 // Adding New Task On Submit
 DOM.form.addEventListener("submit", (e) => {
   e.preventDefault();
-  let newTaskValue = DOM.input.value.trim();
-  // Check If Value is empty
-  if (newTaskValue === "") {
-    DOM.alert.classList.add("d-block");
-    DOM.inputContainer.classList.add("ally-active");
-    DOM.alert.textContent = "Cell Can't be Empty";
-    return; // Stop
+  const newTaskValue = DOM.input.value.trim();
+  const error = validateInput(newTaskValue);
+
+  if (error) {
+    showAlert(DOM, error);
+    return;
   }
-  // Check Before Remove Classes To Skip if false
-  if (DOM.alert.classList.contains("d-block")) {
-    DOM.alert.classList.remove("d-block");
-    DOM.inputContainer.classList.remove("ally-active");
-  }
-  // After Check on Classes Check if value length is more than 40
-  if (newTaskValue.length > 30) {
-    DOM.alert.classList.add("d-block");
-    DOM.inputContainer.classList.add("ally-active");
-    DOM.alert.textContent = `Task name character limit: ${newTaskValue.length} / 30`;
-    return; // Stop
-  }
+  hideAlert(DOM);
+
   // Delete Input Value From Overflow
   DOM.input.value = "";
   sessionStorage.setItem("inputValue", "");
