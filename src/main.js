@@ -23,6 +23,7 @@ const DOM = {
 
   deleteAllBtn: document.querySelector(".delete-all-btn"),
   filtersContainer: document.querySelector(".filters"),
+  filterButtons: document.querySelectorAll(".filter-btn"),
 
   form: document.forms[0],
 };
@@ -30,7 +31,6 @@ const DOM = {
 // derived elements
 DOM.input = DOM.inputContainer?.querySelector("input[type='text']");
 DOM.addBtn = DOM.inputContainer?.querySelector("input[type='submit']");
-DOM.filterButtons = document.querySelectorAll(".filter-btn");
 
 // DOM GUARDS
 if (
@@ -200,10 +200,10 @@ DOM.form.addEventListener("submit", (e) => {
 
   // Create task object
   addTaskFlow({
-    content: value,
+    content: newTaskValue,
     tasksList: DOM.tasksList,
     generateId: generateTaskId,
-  })
+  });
 
   // Delete Input Value From Overflow
   DOM.input.value = "";
@@ -226,12 +226,14 @@ DOM.filtersContainer.addEventListener("click", (e) => {
 
 function filterTasks(filterType = "all") {
   const tasks = DOM.tasksList.querySelectorAll(".todo-item");
+
   tasks.forEach((task) => {
     switch (filterType) {
       // All Tasks
       case "all":
         task.style.display = "flex";
         break;
+
       // Completed Tasks
       case "completed":
         if (task.classList.contains("done")) {
@@ -240,6 +242,7 @@ function filterTasks(filterType = "all") {
           task.style.display = "none";
         }
         break;
+
       // UnCompleted Tasks
       case "uncompleted":
         if (!task.classList.contains("done")) {
