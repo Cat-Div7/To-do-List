@@ -11,6 +11,10 @@ import { initTheme } from "./utils/theme.js";
 import { validateInput } from "./utils/validation.js";
 import { showAlert, hideAlert } from "./utils/alert.js";
 import { addTaskFlow } from "./services/taskService.js";
+import {
+  handleCompleteTask,
+  handleDeleteTask,
+} from "./services/taskActions.js";
 
 // DOM CACHE
 const DOM = {
@@ -109,6 +113,14 @@ function generateTaskId() {
   return `task-${currentId++}`;
 }
 
+function getNextOrder() {
+  return currentOrder++;
+}
+
+function resetTaskId() {
+  currentId = 0;
+}
+
 // Load Id from LocalStorage
 const tasks = getTasks();
 let currentId = tasks.length
@@ -119,49 +131,26 @@ let currentId = tasks.length
 
 // Event Delegation for Complete and Delete Buttons
 DOM.tasksList.addEventListener("click", (e) => {
-  // Get Clicked Button
   const clickedButton =
     e.target.closest(".complete") || e.target.closest(".delete");
+
   if (!clickedButton) return;
-  // Select Elements
-  const $li = clickedButton.closest(".todo-item");
+
+  const li = clickedButton.closest(".todo-item");
   const icon = clickedButton.querySelector("i");
-  // Check If Complete Button Or Delete
+
   if (clickedButton.classList.contains("complete")) {
-    // Toggle done class on the task
-    $li.classList.toggle("done");
-
-    if (icon) {
-      // Toggle the icon between check-circle and undo
-      icon.classList.toggle("fa-undo");
-      icon.classList.toggle("fa-check-circle");
-    }
-
-    // Update completed value in LocalStorage based on 'done' class
-    updateTask($li.id, { completed: $li.classList.contains("done") });
-
-    if ($li.classList.contains("done")) {
-      // Add order to completed task
-      $li.style.order = currentOrder;
-
-      // Update order in LocalStorage
-      updateTask($li.id, { order: currentOrder });
-
-      currentOrder++;
-    } else {
-      // Remove order if task is uncompleted
-      $li.style.order = "";
-      // Reset order in LocalStorage
-      updateTask($li.id, { order: "" });
-    }
-  } else if (clickedButton.classList.contains("delete")) {
-    // Remove From Local Storage Using helper
-    deleteTask($li.id);
-    // Remove Fron the Page
-    $li.remove();
-    // Reset ID if list is empty
-    const count = DOM.tasksList.querySelectorAll(".todo-item").length;
-    if (count < 1) currentId = 0;
+    handleCompleteTask({
+      li,
+      icon,
+      getNextOrder,
+    });
+  } else {
+    handleDeleteTask({
+      li,
+      tasksList: DOM.tasksList,
+      resetId: resetTaskId,
+    });
   }
 });
 
