@@ -15,6 +15,7 @@ import {
   handleCompleteTask,
   handleDeleteTask,
 } from "./services/taskActions.js";
+import { FILTERS, setFilter } from "./services/filterService.js";
 
 // DOM CACHE
 const DOM = {
@@ -92,17 +93,8 @@ window.onload = () => {
   }
 
   // Load Filter From Local Storage
-  const existFilter = localStorage.getItem("filterType");
-  if (existFilter) {
-    filterTasks(existFilter);
-    // remove active from all cached buttons
-    DOM.filterButtons.forEach((btn) => btn.classList.remove("active"));
-    // activate matching button
-    const activeBtn = DOM.filtersContainer.querySelector(
-      `[data-filter='${existFilter}']`,
-    );
-    if (activeBtn) activeBtn.classList.add("active");
-  }
+  const savedFilter = localStorage.getItem("filterType") || FILTERS.ALL;
+  setFilter(DOM, savedFilter);
 
   DOM.input.focus();
 };
@@ -200,49 +192,11 @@ DOM.form.addEventListener("submit", (e) => {
 });
 
 DOM.filtersContainer.addEventListener("click", (e) => {
-  const clickedFilter = e.target.closest(".filter-btn");
-  if (!clickedFilter) return;
-  // clear active state
-  DOM.filterButtons.forEach((btn) => btn.classList.remove("active"));
-  // activate clicked
-  clickedFilter.classList.add("active");
-  // apply filter
-  const filterType = clickedFilter.getAttribute("data-filter");
+  const btn = e.target.closest(".filter-btn");
+  if (!btn) return;
+
+  const filterType = btn.dataset.filter;
   if (!filterType) return;
-  localStorage.setItem("filterType", filterType);
-  filterTasks(filterType);
+
+  setFilter(DOM, filterType);
 });
-
-function filterTasks(filterType = "all") {
-  const tasks = DOM.tasksList.querySelectorAll(".todo-item");
-
-  tasks.forEach((task) => {
-    switch (filterType) {
-      // All Tasks
-      case "all":
-        task.style.display = "flex";
-        break;
-
-      // Completed Tasks
-      case "completed":
-        if (task.classList.contains("done")) {
-          task.style.display = "flex";
-        } else {
-          task.style.display = "none";
-        }
-        break;
-
-      // UnCompleted Tasks
-      case "uncompleted":
-        if (!task.classList.contains("done")) {
-          task.style.display = "flex";
-        } else {
-          task.style.display = "none";
-        }
-        break;
-    }
-  });
-}
-
-// Initial filter application on load (optional, defaults to 'all')
-filterTasks("all");
