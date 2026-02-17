@@ -1,4 +1,4 @@
-export function validateInput(value) {
+export function validateInput(value: string) {
   if (value === "") {
     return "Cell Can't be Empty";
   }
