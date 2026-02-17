@@ -15,7 +15,11 @@ import {
   handleCompleteTask,
   handleDeleteTask,
 } from "./services/taskActions.js";
-import { FILTERS, setFilter } from "./services/filterService.js";
+import {
+  FILTERS,
+  setFilter,
+  reapplyCurrentFilter,
+} from "./services/filterService.js";
 
 // DOM CACHE
 const DOM = {
@@ -137,12 +141,14 @@ DOM.tasksList.addEventListener("click", (e) => {
       icon,
       getNextOrder,
     });
+    reapplyCurrentFilter(DOM);
   } else {
     handleDeleteTask({
       li,
       tasksList: DOM.tasksList,
       resetId: resetTaskId,
     });
+    reapplyCurrentFilter(DOM);
   }
 });
 
@@ -185,6 +191,8 @@ DOM.form.addEventListener("submit", (e) => {
     tasksList: DOM.tasksList,
     generateId: generateTaskId,
   });
+
+  reapplyCurrentFilter(DOM);
 
   // Delete Input Value From Overflow
   DOM.input.value = "";

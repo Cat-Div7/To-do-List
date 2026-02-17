@@ -1,3 +1,5 @@
+const FILTER_STORAGE_KEY = "filterType";
+
 export const FILTERS = {
   ALL: "all",
   COMPLETED: "completed",
@@ -21,16 +23,19 @@ export function applyFilter(DOM, filterType) {
 
 export function updateActiveFilterButton(DOM, filterType) {
   DOM.filterButtons.forEach((btn) => {
-    btn.classList.toggle(
-      "active",
-      btn.dataset.filter === filterType
-    );
+    btn.classList.toggle("active", btn.dataset.filter === filterType);
   });
 }
 
 export function setFilter(DOM, filterType) {
-  localStorage.setItem("filterType", filterType);
+  localStorage.setItem(FILTER_STORAGE_KEY, filterType);
 
   updateActiveFilterButton(DOM, filterType);
   applyFilter(DOM, filterType);
+}
+
+export function reapplyCurrentFilter(DOM) {
+  const currentFilter = localStorage.getItem(FILTER_STORAGE_KEY) || FILTERS.ALL;
+
+  applyFilter(DOM, currentFilter);
 }
