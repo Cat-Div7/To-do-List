@@ -1,4 +1,4 @@
-const FILTER_STORAGE_KEY = "filterType";
+export const FILTER_STORAGE_KEY = "filterType";
 
 export const FILTERS = {
   ALL: "all",

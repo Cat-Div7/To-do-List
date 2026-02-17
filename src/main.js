@@ -19,6 +19,7 @@ import {
   FILTERS,
   setFilter,
   reapplyCurrentFilter,
+  FILTER_STORAGE_KEY,
 } from "./services/filterService.js";
 
 // DOM CACHE
@@ -68,7 +69,7 @@ function runOnceFunction() {
     {
       id: "task-2",
       content: "Build a To-Do List",
-      completed: false,
+      completed: true,
       order: "",
     },
   ];
@@ -97,7 +98,7 @@ window.onload = () => {
   }
 
   // Load Filter From Local Storage
-  const savedFilter = localStorage.getItem("filterType") || FILTERS.ALL;
+  const savedFilter = localStorage.getItem(FILTER_STORAGE_KEY) || FILTERS.ALL;
   setFilter(DOM, savedFilter);
 
   DOM.input.focus();
@@ -105,6 +106,8 @@ window.onload = () => {
 
 // Declare Order To Completed Tasks
 let currentOrder = 1;
+
+// Helper Funcs
 function generateTaskId() {
   return `task-${currentId++}`;
 }
@@ -122,8 +125,6 @@ const tasks = getTasks();
 let currentId = tasks.length
   ? Math.max(...tasks.map((t) => Number(t.id.split("-")[1]))) + 1
   : 0;
-// Complete Button Click Event For Existed Elements Before Only
-// Add Event Listeners to Existing Buttons on Page Load
 
 // Event Delegation for Complete and Delete Buttons
 DOM.tasksList.addEventListener("click", (e) => {
@@ -163,7 +164,7 @@ DOM.deleteAllBtn.addEventListener("click", () => {
   resetTasks();
 });
 
-// On Input Check If Value Length is More than 30
+// Validating The Input
 DOM.input.oninput = () => {
   const value = DOM.input.value.trim();
   sessionStorage.setItem("inputValue", value);
@@ -173,7 +174,7 @@ DOM.input.oninput = () => {
   else hideAlert(DOM);
 };
 
-// Adding New Task On Submit
+// Creating a new task onsubmit
 DOM.form.addEventListener("submit", (e) => {
   e.preventDefault();
   const newTaskValue = DOM.input.value.trim();
@@ -185,7 +186,6 @@ DOM.form.addEventListener("submit", (e) => {
   }
   hideAlert(DOM);
 
-  // Create task object
   addTaskFlow({
     content: newTaskValue,
     tasksList: DOM.tasksList,
@@ -194,11 +194,12 @@ DOM.form.addEventListener("submit", (e) => {
 
   reapplyCurrentFilter(DOM);
 
-  // Delete Input Value From Overflow
+  // Reseting the Input Overflow
   DOM.input.value = "";
   sessionStorage.setItem("inputValue", "");
 });
 
+// Toggling active state in filter btns
 DOM.filtersContainer.addEventListener("click", (e) => {
   const btn = e.target.closest(".filter-btn");
   if (!btn) return;
