@@ -2,5 +2,5 @@ export interface Task {
   id: string;
   content: string;
   completed: boolean;
-  order?: string;
+  order: string;
 }

@@ -1,5 +1,9 @@
-function applySavedTheme(DOM) {
-  const themeMode = localStorage.getItem("themeMode");
+import type { AppDOM } from "../types";
+
+type ThemeMode = "dark-mode" | "light-mode";
+
+function applySavedTheme(DOM: AppDOM): void {
+  const themeMode = localStorage.getItem("themeMode") as ThemeMode | null;
 
   if (!themeMode) return;
   document.body.classList.remove("dark-mode", "normal-mode");
@@ -14,7 +18,7 @@ function applySavedTheme(DOM) {
   }
 }
 
-function setupThemeToggle(DOM) {
+function setupThemeToggle(DOM: AppDOM): void {
   DOM.modeBtn.addEventListener("click", () => {
     const isDark = DOM.modeBtn.checked;
 
@@ -26,7 +30,7 @@ function setupThemeToggle(DOM) {
   });
 }
 
-export function initTheme(DOM) {
+export function initTheme(DOM: AppDOM): void {
   applySavedTheme(DOM);
   setupThemeToggle(DOM);
 }

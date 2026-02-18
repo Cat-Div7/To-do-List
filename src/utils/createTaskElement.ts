@@ -1,5 +1,5 @@
 import { checkIcon, trashIcon } from "./icons.js";
-import { Task } from "../types";
+import type { Task } from "../types";
 
 export function createTaskElement(task: Task): HTMLLIElement {
   const $li = document.createElement("li");

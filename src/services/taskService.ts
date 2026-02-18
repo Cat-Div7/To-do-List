@@ -1,6 +1,6 @@
 import { addTask } from "../storage/tasks.js";
 import { createTaskElement } from "../utils/createTaskElement.js";
-import { Task } from "../types";
+import type { Task } from "../types";
 
 interface AddTaskFlowParams {
   content: string;
