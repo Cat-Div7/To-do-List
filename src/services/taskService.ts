@@ -1,13 +1,21 @@
 import { addTask } from "../storage/tasks.js";
 import { createTaskElement } from "../utils/createTaskElement.js";
+import { Task } from "../types";
+
+interface AddTaskFlowParams {
+  content: string;
+  tasksList: HTMLUListElement;
+  generateId: () => string;
+}
+
 
 export function addTaskFlow({
   content,
   tasksList,
   generateId,
-}) {
+}: AddTaskFlowParams): void {
   // create task object
-  const task = {
+  const task: Task = {
     id: generateId(),
     content,
     completed: false,
@@ -22,6 +30,4 @@ export function addTaskFlow({
 
   // persist
   addTask(task);
-
-  return task;
 }
