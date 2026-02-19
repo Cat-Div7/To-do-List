@@ -12,6 +12,7 @@ interface DeleteTaskParams {
   resetId: () => void;
 }
 
+// Handle Compelete Task
 export function handleCompleteTask({
   li,
   icon,
@@ -38,6 +39,7 @@ export function handleCompleteTask({
   }
 }
 
+// Handle Delete Task
 export function handleDeleteTask({
   li,
   tasksList,
