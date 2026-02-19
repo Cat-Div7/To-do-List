@@ -5,5 +5,8 @@ export interface AppDOM {
   modeBtn: HTMLInputElement;
   themeText: HTMLElement;
 
+  tasksList: HTMLElement;
+  filterButtons: NodeListOf<HTMLButtonElement>;
+
   // Add others as needed
 }
