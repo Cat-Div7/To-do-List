@@ -1,6 +1,22 @@
 import { updateTask, deleteTask } from "../storage/tasks.js";
 
-export function handleCompleteTask({ li, icon, getNextOrder }) {
+interface CompeleteTaskParams {
+  li: HTMLLIElement;
+  icon?: HTMLElement | null;
+  getNextOrder: () => number;
+}
+
+interface DeleteTaskParams {
+  li: HTMLLIElement;
+  tasksList: HTMLUListElement;
+  resetId: () => void;
+}
+
+export function handleCompleteTask({
+  li,
+  icon,
+  getNextOrder,
+}: CompeleteTaskParams): void {
   li.classList.toggle("done");
 
   if (icon) {
@@ -14,15 +30,19 @@ export function handleCompleteTask({ li, icon, getNextOrder }) {
 
   if (isDone) {
     const order = getNextOrder();
-    li.style.order = order;
-    updateTask(li.id, { order });
+    li.style.order = String(order);
+    updateTask(li.id, { order: String(order) });
   } else {
     li.style.order = "";
     updateTask(li.id, { order: "" });
   }
 }
 
-export function handleDeleteTask({ li, tasksList, resetId }) {
+export function handleDeleteTask({
+  li,
+  tasksList,
+  resetId,
+}: DeleteTaskParams): void {
   deleteTask(li.id);
   li.remove();
 
