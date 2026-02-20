@@ -1,4 +1,4 @@
-import type { AppDOM } from "../types";
+import type { AppDOM } from "../types/index.js";
 
 export function showAlert(DOM: AppDOM, message: string): void {
   DOM.alert.classList.add("d-block");

@@ -1,5 +1,5 @@
-import type { AppDOM } from "../types";
-import { FILTERS, type FilterType } from "../types";
+import type { AppDOM } from "../types/index.js";
+import { FILTERS, type FilterType } from "../types/index.js";
 
 export const FILTER_STORAGE_KEY = "filterType";
 

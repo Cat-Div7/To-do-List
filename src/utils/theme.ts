@@ -1,4 +1,4 @@
-import type { AppDOM } from "../types";
+import type { AppDOM } from "../types/index.js";
 
 type ThemeMode = "dark-mode" | "light-mode";
 

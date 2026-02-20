@@ -14,7 +14,7 @@ import {
   FILTER_STORAGE_KEY,
 } from "./services/filterService.js";
 // Only type imports use "type"
-import { FILTERS } from "./types";
+import { FILTERS } from "./types/filter.js";
 import type { AppDOM } from "./types";
 
 // DOM CACHE
